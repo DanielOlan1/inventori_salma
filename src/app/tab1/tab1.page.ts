@@ -2,6 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { TimerService } from '../time.service';
+import { ExcelService } from '../excel.service';
 
 @Component({
   selector: 'app-tab1',
@@ -36,7 +37,7 @@ export class Tab1Page implements OnInit {
   expirationTime: number = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
   remainingTime: number = 0;
 
-  constructor(private modalController: ModalController, private alertController: AlertController, private timerService: TimerService) {}
+  constructor(private modalController: ModalController, private alertController: AlertController, private timerService: TimerService, private excelService: ExcelService) {}
 
   ngOnInit() {
     this.loadInventoryData();
@@ -149,5 +150,14 @@ agregarProducto() {
       this.productOptions.push(this.newOption);
       this.showAddOption = false;
     }
+  }
+
+
+  exportDataToExcel() {
+    // Aquí debes proporcionar los datos que deseas exportar
+    const dataToExport = this.inventoryData;
+
+    // Llama al servicio para exportar a Excel
+    this.excelService.exportToExcel(dataToExport, 'Inventary_salma', '1');
   }
 }
