@@ -10,7 +10,9 @@ import { TimerService } from '../time.service';
 })
 export class Tab1Page implements OnInit {
   productName: string = '';
-  quantity: number = 0;
+  quantity: number = 1;
+  quantityOptions: number[] = Array.from({ length: 100 }, (_, i) => i + 1); // Opciones de 1 a 10
+
   inventoryData: { productName: string, quantity: number }[] = [];
   productOptions: string[] = [
     'GPS TRACTO', 
@@ -47,9 +49,22 @@ export class Tab1Page implements OnInit {
   loadInventoryData() {
     const savedData = localStorage.getItem('inventory');
     if (savedData) {
-      this.inventoryData = JSON.parse(savedData);
+      try {
+        const parsedData = JSON.parse(savedData);
+  
+        // Verificar si parsedData tiene una propiedad 'data' que es un array
+        if (Array.isArray(parsedData.data)) {
+          this.inventoryData = parsedData.data;
+        } else {
+          this.inventoryData = [];
+        }
+      } catch (error) {
+        console.error('Error parsing inventory data from localStorage:', error);
+        this.inventoryData = [];
+      }
     }
   }
+  
 
   startExpirationCountdown() {
     const expirationDate = new Date().getTime() + this.expirationTime;
@@ -73,17 +88,26 @@ agregarProducto() {
     return;
   }
 
-  // Agregar el nuevo producto
-  const selectedOption = this.newOption ? this.newOption : this.productName;
-  this.inventoryData.push({ productName: selectedOption, quantity: this.quantity });
+  // Buscar el producto en el inventario
+  const existingProductIndex = this.inventoryData.findIndex(item => item.productName === this.productName);
+
+  if (existingProductIndex !== -1) {
+    // Si el producto ya existe, actualizar la cantidad
+    this.inventoryData[existingProductIndex].quantity += this.quantity;
+  } else {
+    // Si el producto no existe, agregarlo al inventario
+    this.inventoryData.push({ productName: this.productName, quantity: this.quantity });
+  }
 
   // Guardar la información actualizada en el Local Storage junto con la marca de tiempo
   const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 horas en milisegundos
   const dataToSave = { data: this.inventoryData, expirationTimestamp };
   localStorage.setItem('inventory', JSON.stringify(dataToSave));
 
-  // Limpiar los campos del formulario
+  // Restablecer el valor del nombre del producto
   this.productName = '';
+
+  // Limpiar los campos del formulario
   this.newOption = '';
   this.quantity = 0;
   this.showAddOption = false;
@@ -91,6 +115,7 @@ agregarProducto() {
   // Reiniciar el contador
   this.startExpirationCountdown();
 }
+
 
 
   async eliminarProducto(index: number) {

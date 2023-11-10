@@ -30,8 +30,13 @@
 
   <ion-item>
     <ion-label>Cantidad</ion-label>
-    <ion-input [(ngModel)]="quantity" name="quantity" type="number" required></ion-input>
+    <ion-select [(ngModel)]="quantity" name="quantity" required>
+      <ion-select-option *ngFor="let option of quantityOptions" [value]="option">
+        {{ option }}
+      </ion-select-option>
+    </ion-select>
   </ion-item>
+  
 
 
 
