@@ -1,17 +1,29 @@
-<ion-header [translucent]="true">
+<!-- tab1.page.html -->
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
+    <ion-title>Formulario de Inventario</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
+  <ion-item>
+    <ion-label>Nombre del Producto</ion-label>
+    <ion-input [(ngModel)]="productName" name="productName" required></ion-input>
+  </ion-item>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <ion-item>
+    <ion-label>Cantidad</ion-label>
+    <ion-input [(ngModel)]="quantity" name="quantity" type="number" required></ion-input>
+  </ion-item>
+
+  <ion-button expand="full" (click)="tomarFoto()">Agregar Producto</ion-button>
+
+  <div>
+    <div *ngFor="let item of inventoryData; let i = index">
+      <ion-item>
+        <ion-label>Producto: {{ item.productName }}, Cantidad: {{ item.quantity }}</ion-label>
+        <ion-button expand="block" (click)="eliminarProducto(i)">Eliminar</ion-button>
+      </ion-item>
+    </div>
+  </div>
 </ion-content>
