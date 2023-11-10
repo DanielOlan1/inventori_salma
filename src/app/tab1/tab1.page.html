@@ -6,21 +6,38 @@
 </ion-header>
 
 <ion-content>
+  <ion-item *ngIf="remainingTime > 0">
+    <ion-label>Tiempo Restante para Expirar:</ion-label>
+    <h1>{{ formatRemainingTime() }}</h1>
+  </ion-item>
+<ion-item>
+  <ion-label>¿Deseas agregar algo nuevo?</ion-label>
+</ion-item>
+<ion-item>
+  <ion-item *ngIf="showAddOption">
+    <ion-label>Nueva Opción</ion-label>
+    <ion-input [(ngModel)]="newOption" name="newOption" required></ion-input>
+  </ion-item>
+  <ion-button expand="full" *ngIf="!showAddOption" (click)="toggleAddOption()">Agregar Nueva Opción</ion-button>
 
+  <ion-button expand="full" *ngIf="showAddOption" (click)="agregarNuevaOpcion()">Confirmar Nueva Opción</ion-button></ion-item>
   <ion-item>
     <ion-label>Equipo Completo</ion-label>
     <ion-select [(ngModel)]="productName" name="productName" required>
       <ion-select-option *ngFor="let option of productOptions" [value]="option">{{ option }}</ion-select-option>
     </ion-select>
   </ion-item>
-  
+
   <ion-item>
     <ion-label>Cantidad</ion-label>
     <ion-input [(ngModel)]="quantity" name="quantity" type="number" required></ion-input>
   </ion-item>
 
+
+
   <ion-button expand="full" (click)="agregarProducto()">Agregar Producto</ion-button>
 
+  
   <div>
     <div *ngFor="let item of inventoryData; let i = index">
       <ion-item>
