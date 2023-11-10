@@ -26,7 +26,10 @@ export class Tab1Page implements OnInit {
     'CAMARA OPERADOR',
     'CAMARA CARRETERA',
     'TABLETA',
-    'BARRAS MAGNETICAS'
+    'BARRAS MAGNETICAS',
+    'CABLE 7 HILOS',
+    'DISPOSITIVO TELEMETRIA'
+
   ];
   showAddOption: boolean = false;
   newOption: string = '';
