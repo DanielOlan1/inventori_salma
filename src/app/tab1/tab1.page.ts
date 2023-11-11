@@ -158,13 +158,11 @@ export class Tab1Page implements OnInit {
   }
 
   async descargarArchivo(): Promise<void> {
-    if (this.file) {
-      try {
-        await this.excelService.exportToExcelFile(this.file, this.inventoryData, 'inventario');
-        console.log('Archivo exportado y descargado exitosamente.');
-      } catch (error) {
-        console.error('Error al exportar y descargar el archivo:', error);
-      }
+    try {
+      await this.excelService.exportToExcel(this.inventoryData, 'inventory', 'inventario');
+      console.log('Archivo exportado y descargado exitosamente.');
+    } catch (error) {
+      console.error('Error al exportar y descargar el archivo:', error);
     }
   }
 

@@ -6,10 +6,10 @@
 </ion-header>
 
 <ion-content mode="ios">
-  <ion-item *ngIf="remainingTime > 0" mode="ios">
+  <!-- <ion-item *ngIf="remainingTime > 0" mode="ios">
     <ion-label>Tiempo restante:</ion-label>
     <ion-text>{{ formatRemainingTime() }}</ion-text>
-  </ion-item>
+  </ion-item> -->
 <ion-item mode="ios">
   <ion-label>¿Deseas agregar algo nuevo?</ion-label>
 </ion-item>
@@ -21,16 +21,16 @@
   <ion-button expand="full" *ngIf="!showAddOption" (click)="toggleAddOption()" mode="ios">Agregar Nueva Opción</ion-button>
 
   <ion-button expand="full" *ngIf="showAddOption" (click)="agregarNuevaOpcion()" mode="ios">Confirmar Nueva Opción</ion-button></ion-item>
-  <ion-item mode="ios">
+  <ion-item>
     <ion-label>Equipo Completo</ion-label>
-    <ion-select [(ngModel)]="productName" name="productName" required>
+    <ion-select [(ngModel)]="productName" name="productName" required label="Product Name">
       <ion-select-option *ngFor="let option of productOptions" [value]="option">{{ option }}</ion-select-option>
     </ion-select>
   </ion-item>
-
+  
   <ion-item>
     <ion-label>Cantidad</ion-label>
-    <ion-select [(ngModel)]="quantity" name="quantity" required>
+    <ion-select [(ngModel)]="quantity" name="quantity" required label="Quantity">
       <ion-select-option *ngFor="let option of quantityOptions" [value]="option">
         {{ option }}
       </ion-select-option>

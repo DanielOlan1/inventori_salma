@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import * as XLSX from 'xlsx';
 
 @Injectable({
   providedIn: 'root',
@@ -7,29 +6,23 @@ import * as XLSX from 'xlsx';
 export class ExcelService {
   constructor() {}
 
-  exportToExcelFile(file: File, data: any[], sheetName: string): void {
-    const reader = new FileReader();
+  async exportToExcel(data: any[], fileName: string, sheetName: string): Promise<void> {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(sheetName);
 
-    reader.onload = (event) => {
-      const arrayBuffer = event.target?.result as ArrayBuffer;
-      const uint8Array = new Uint8Array(arrayBuffer);
-      const workbook: XLSX.WorkBook = XLSX.read(uint8Array, { type: 'array' });
+    // Agrega tus datos al worksheet
+    worksheet.addRows(data);
 
-      const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-      workbook.Sheets[sheetName] = worksheet;
+    // Crea un blob a partir del workbook
+    const blob = await workbook.xlsx.writeBuffer();
 
-      // Create a blob from the workbook
-      const blob = XLSX.write(workbook, { bookType: 'xlsx' });
-
-      // Create a download link and trigger a click event
-      const link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      link.download = file.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    };
-
-    reader.readAsArrayBuffer(file);
+    // Crea un objeto Blob y descarga el archivo
+    const file = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(file);
+    link.download = fileName + '.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
