@@ -42,8 +42,8 @@
   
 
   
-  <div>
-    <div *ngFor="let item of inventoryData; let i = index">
+  <div #capturableContent>
+    <div  *ngFor="let item of inventoryData; let i = index">
       <ion-card mode="ios">
         <ion-item>
           <ion-label>Producto: {{ item.productName }}</ion-label>
@@ -58,10 +58,10 @@
       </ion-card>
   
     </div>
-    <ion-item >
-<!-- tab1.page.html -->
-<ion-button (click)="exportarAExcel()">Descargar Archivo</ion-button>
-    </ion-item>
+ 
+    
   </div>
-
+   <ion-item>
+      <ion-button (click)="capturarPantalla()">Capturar Pantalla</ion-button>
+    </ion-item>
 </ion-content>

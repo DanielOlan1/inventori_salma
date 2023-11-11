@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { TimerService } from '../time.service';
-import { ExcelService } from '../excel.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-tab1',
@@ -13,6 +13,8 @@ import { ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Tab1Page implements OnInit {
+  @ViewChild('capturableContent', { static: false }) capturableContent!: ElementRef;
+
   productName: string = '';
   quantity: number = 1;
   quantityOptions: number[] = Array.from({ length: 100 }, (_, i) => i + 1); // Opciones de 1 a 10
@@ -43,7 +45,6 @@ export class Tab1Page implements OnInit {
     private modalController: ModalController, 
     private alertController: AlertController, 
     private timerService: TimerService, 
-    private excelService: ExcelService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone) {}
 
@@ -151,29 +152,64 @@ export class Tab1Page implements OnInit {
     this.file = event.target.files[0];
   }
 
-  exportarAExcel(): Promise<Blob> {
-    return this.excelService.exportToExcel(this.inventoryData, 'nombre_archivo')
-      .then(result => result.blob);  // Obtén solo el Blob del objeto devuelto
-  }
-  
-  
-  
-  
-
   toggleAddOption() {
-    // Cambia el valor de showAddOption
     this.showAddOption = !this.showAddOption;
-    
-    // Limpiar el valor de newOption cuando se desactiva el toggle
     if (!this.showAddOption) {
       this.newOption = '';
     }
-  
-    // Aplica detección de cambios y ejecuta en la zona Angular
-    this.zone.run(() => {
+      this.zone.run(() => {
       this.cdr.markForCheck();
     });
   }
+  
+  copyDataUrlManually(dataUrl: string) {
+    // Display a message with the data URL
+    const message = `Shareable URL: ${dataUrl}\nYou can manually copy this URL.`;
+    alert(message);
+  
+    // Alternatively, you could display the message in your UI
+    // and provide instructions for the user to copy the URL.
+  }
+  
+  capturarPantalla() {
+    const content = this.capturableContent.nativeElement;
+  
+    if (content) {
+      html2canvas(content).then((canvas) => {
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const dataUrl = reader.result as string;
+  
+              // Call the function to prompt the user to copy the URL manually
+              this.copyDataUrlManually(dataUrl);
+            };
+            reader.readAsDataURL(blob);
+          }
+        }, 'image/png');
+      });
+    } else {
+      console.error('Container element not found.');
+    }
+  }
+  
+  
+  
+  copyDataUrl(dataUrl: string) {
+    const textarea = document.createElement('textarea');
+    textarea.value = dataUrl;
+    document.body.appendChild(textarea);
+  
+    textarea.select();
+    document.execCommand('copy');
+  
+    document.body.removeChild(textarea);
+  
+    console.log('URL copied to clipboard:', dataUrl);
+  }
+  
+  
   
 
 }
