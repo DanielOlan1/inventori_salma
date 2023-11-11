@@ -30,7 +30,6 @@ export class Tab1Page implements OnInit {
     'BARRAS MAGNETICAS',
     'CABLE 7 HILOS',
     'DISPOSITIVO TELEMETRIA'
-
   ];
   showAddOption: boolean = false;
   newOption: string = '';
@@ -42,7 +41,9 @@ export class Tab1Page implements OnInit {
   ngOnInit() {
     this.loadInventoryData();
     this.timerService.startExpirationCountdown(this.expirationTime);
+ 
   }
+
   formatRemainingTime(): string {
     const hours = Math.floor(this.remainingTime / (60 * 60 * 1000));
     const minutes = Math.floor((this.remainingTime % (60 * 60 * 1000)) / (60 * 1000));
@@ -50,6 +51,7 @@ export class Tab1Page implements OnInit {
 
     return `${hours}h ${minutes}m ${seconds}s`;
   }
+
   loadInventoryData() {
     const savedData = localStorage.getItem('inventory');
     if (savedData) {
@@ -69,7 +71,6 @@ export class Tab1Page implements OnInit {
     }
   }
   
-
   startExpirationCountdown() {
     const expirationDate = new Date().getTime() + this.expirationTime;
 
@@ -85,42 +86,39 @@ export class Tab1Page implements OnInit {
     }, 1000);
   }
 
-// tab1.page.ts
-agregarProducto() {
-  // Validar los datos antes de agregarlos al Local Storage
-  if ((this.productName.trim() === '' && !this.newOption) || this.quantity <= 0) {
-    return;
+  agregarProducto() {
+    // Validar los datos antes de agregarlos al Local Storage
+    if ((this.productName.trim() === '' && !this.newOption) || this.quantity <= 0) {
+      return;
+    }
+
+    // Buscar el producto en el inventario
+    const existingProductIndex = this.inventoryData.findIndex(item => item.productName === this.productName);
+
+    if (existingProductIndex !== -1) {
+      // Si el producto ya existe, actualizar la cantidad
+      this.inventoryData[existingProductIndex].quantity += this.quantity;
+    } else {
+      // Si el producto no existe, agregarlo al inventario
+      this.inventoryData.push({ productName: this.productName, quantity: this.quantity });
+    }
+
+    // Guardar la información actualizada en el Local Storage junto con la marca de tiempo
+    const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+    const dataToSave = { data: this.inventoryData, expirationTimestamp };
+    localStorage.setItem('inventory', JSON.stringify(dataToSave));
+
+    // Restablecer el valor del nombre del producto
+    this.productName = '';
+
+    // Limpiar los campos del formulario
+    this.newOption = '';
+    this.quantity = 0;
+    this.showAddOption = false;
+
+    // Reiniciar el contador
+    this.startExpirationCountdown();
   }
-
-  // Buscar el producto en el inventario
-  const existingProductIndex = this.inventoryData.findIndex(item => item.productName === this.productName);
-
-  if (existingProductIndex !== -1) {
-    // Si el producto ya existe, actualizar la cantidad
-    this.inventoryData[existingProductIndex].quantity += this.quantity;
-  } else {
-    // Si el producto no existe, agregarlo al inventario
-    this.inventoryData.push({ productName: this.productName, quantity: this.quantity });
-  }
-
-  // Guardar la información actualizada en el Local Storage junto con la marca de tiempo
-  const expirationTimestamp = Date.now() + 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-  const dataToSave = { data: this.inventoryData, expirationTimestamp };
-  localStorage.setItem('inventory', JSON.stringify(dataToSave));
-
-  // Restablecer el valor del nombre del producto
-  this.productName = '';
-
-  // Limpiar los campos del formulario
-  this.newOption = '';
-  this.quantity = 0;
-  this.showAddOption = false;
-
-  // Reiniciar el contador
-  this.startExpirationCountdown();
-}
-
-
 
   async eliminarProducto(index: number) {
     const confirmDelete = await this.alertController.create({
@@ -153,51 +151,21 @@ agregarProducto() {
     }
   }
 
-  downloadLink: string | null = null; 
-  async downloadAndShowLink(dataToExport: any[], fileName: string, sheetName: string) {
-    // Descarga el archivo Excel y obtén el Blob del servicio
-    const blob = this.excelService.downloadExcel(dataToExport, fileName, sheetName);
+  private file: File | undefined;
 
-    // Crea una URL para el Blob
-    const url = URL.createObjectURL(blob);
-
-    // Muestra el enlace en la interfaz de usuario
-    this.downloadLink = url;
-  }
-  
-
-  async confirmarDescarga() {
-    const confirmAlert = await this.alertController.create({
-      header: 'Confirmar Descarga',
-      message: '¿Deseas descargar el archivo?',
-      mode: 'ios',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-        },
-        {
-          text: 'Descargar',
-          handler: () => {
-            this.descargarArchivo();
-          },
-        },
-      ],
-    });
-
-    await confirmAlert.present();
+  handleFileInput(event: any): void {
+    this.file = event.target.files[0];
   }
 
-  async descargarArchivo() {
-    if (this.downloadLink) {
-      const link = document.createElement('a');
-      link.href = this.downloadLink;
-      link.download = 'nombre-del-archivo.xlsx';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+  async descargarArchivo(): Promise<void> {
+    if (this.file) {
+      try {
+        await this.excelService.exportToExcelFile(this.file, this.inventoryData, 'inventario');
+        console.log('Archivo exportado y descargado exitosamente.');
+      } catch (error) {
+        console.error('Error al exportar y descargar el archivo:', error);
+      }
     }
   }
-}
 
+}

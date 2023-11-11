@@ -47,7 +47,10 @@
     <div *ngFor="let item of inventoryData; let i = index">
       <ion-card mode="ios">
         <ion-item>
-          <ion-label>Producto: {{ item.productName }}, Cantidad: {{ item.quantity }}</ion-label>
+          <ion-label>Producto: {{ item.productName }}</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label> Cantidad: {{ item.quantity }}</ion-label>
         </ion-item>
         <ion-item>
           <ion-button expand="block" (click)="eliminarProducto(i)">Eliminar</ion-button>
@@ -56,13 +59,10 @@
       </ion-card>
   
     </div>
-    <ion-item mode="ios">
-      <ion-button (click)="confirmarDescarga()" >Descargar Archivo</ion-button>
+    <ion-item >
+<!-- tab1.page.html -->
+<ion-button (click)="descargarArchivo()">Descargar Archivo</ion-button>
     </ion-item>
   </div>
 
-  <ion-item *ngIf="downloadLink" mode="ios">
-    <ion-label>Enlace de Descarga:</ion-label>
-    <ion-text>{{ downloadLink }}</ion-text>
-  </ion-item>
 </ion-content>

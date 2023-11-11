@@ -1,4 +1,3 @@
-// excel.service.ts
 import { Injectable } from '@angular/core';
 import * as XLSX from 'xlsx';
 
@@ -6,15 +5,31 @@ import * as XLSX from 'xlsx';
   providedIn: 'root',
 })
 export class ExcelService {
-  downloadExcel(data: any[], fileName: string, sheetName: string): Blob {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(data);
+  constructor() {}
 
-    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  exportToExcelFile(file: File, data: any[], sheetName: string): void {
+    const reader = new FileReader();
 
-    // Genera un Blob desde el libro
-    const blob = XLSX.write(wb, { bookType: 'xlsx', type: 'blob' as 'string' });
+    reader.onload = (event) => {
+      const arrayBuffer = event.target?.result as ArrayBuffer;
+      const uint8Array = new Uint8Array(arrayBuffer);
+      const workbook: XLSX.WorkBook = XLSX.read(uint8Array, { type: 'array' });
 
-    return blob;
+      const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+      workbook.Sheets[sheetName] = worksheet;
+
+      // Create a blob from the workbook
+      const blob = XLSX.write(workbook, { bookType: 'xlsx' });
+
+      // Create a download link and trigger a click event
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    reader.readAsArrayBuffer(file);
   }
 }
