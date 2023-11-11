@@ -152,8 +152,12 @@ export class Tab1Page implements OnInit {
   }
 
   exportarAExcel(): Promise<Blob> {
-    return this.excelService.exportToExcel(this.inventoryData, 'nombre_archivo');
+    return this.excelService.exportToExcel(this.inventoryData, 'nombre_archivo')
+      .then(result => result.blob);  // Obtén solo el Blob del objeto devuelto
   }
+  
+  
+  
   
 
   toggleAddOption() {
