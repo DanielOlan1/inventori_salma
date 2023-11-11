@@ -6,23 +6,22 @@ import { Injectable } from '@angular/core';
 export class ExcelService {
   constructor() {}
 
-  async exportToExcel(data: any[], fileName: string, sheetName: string): Promise<void> {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(sheetName);
+  exportToExcel(inventoryData: { productName: string, quantity: number }[], fileName: string): void {
+    const header = ['Producto', 'Cantidad'];
+    const data = inventoryData.map(item => [item.productName, item.quantity]);
 
-    // Agrega tus datos al worksheet
-    worksheet.addRows(data);
+    const content = [header, ...data];
 
-    // Crea un blob a partir del workbook
-    const blob = await workbook.xlsx.writeBuffer();
-
-    // Crea un objeto Blob y descarga el archivo
-    const file = new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const blob = new Blob([this.arrayToCSV(content)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(file);
-    link.download = fileName + '.xlsx';
+    link.href = URL.createObjectURL(blob);
+    link.download = `${fileName}.xlsx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  private arrayToCSV(data: any[][]): string {
+    return data.map(row => row.join(',')).join('\n');
   }
 }
