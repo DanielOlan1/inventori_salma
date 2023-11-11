@@ -10,17 +10,18 @@
     <ion-label>Tiempo restante:</ion-label>
     <ion-text>{{ formatRemainingTime() }}</ion-text>
   </ion-item> -->
-<ion-item mode="ios">
-  <ion-label>¿Deseas agregar algo nuevo?</ion-label>
-</ion-item>
-<ion-item mode="ios" >
-  <ion-item *ngIf="showAddOption" mode="ios">
-    <ion-label>Nueva Opción</ion-label>
-    <ion-input [(ngModel)]="newOption" name="newOption" required></ion-input>
+  <ion-item mode="ios">
+    {{ showAddOption ? 'Deseas agregar algo nuevo' : 'Agregar nueva opción' }}
+    <ion-toggle [(ngModel)]="showAddOption" (ionChange)="toggleAddOption()" ></ion-toggle>
   </ion-item>
-  <ion-button expand="full" *ngIf="!showAddOption" (click)="toggleAddOption()" mode="ios">Agregar Nueva Opción</ion-button>
-
-  <ion-button expand="full" *ngIf="showAddOption" (click)="agregarNuevaOpcion()" mode="ios">Confirmar Nueva Opción</ion-button></ion-item>
+  
+  <ion-item *ngIf="showAddOption" mode="ios">
+      <ion-input [(ngModel)]="newOption" name="newOption" required label="Nueva Opción"></ion-input>
+    
+  </ion-item>
+  
+  <ion-button expand="full" *ngIf="showAddOption" (click)="agregarNuevaOpcion()" mode="ios">Confirmar Nueva Opción</ion-button>
+  
   <ion-item>
     <ion-label>Equipo Completo</ion-label>
     <ion-select [(ngModel)]="productName" name="productName" required label="Product Name">
@@ -37,10 +38,8 @@
     </ion-select>
   </ion-item>
   
-
-
-
-  <ion-button expand="full" (click)="agregarProducto()">Agregar Producto</ion-button>
+  <ion-button *ngIf="productName && quantity" expand="full" (click)="agregarProducto()">Agregar Producto</ion-button>
+  
 
   
   <div>

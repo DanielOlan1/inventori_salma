@@ -6,22 +6,29 @@ import { Injectable } from '@angular/core';
 export class ExcelService {
   constructor() {}
 
-  exportToExcel(inventoryData: { productName: string, quantity: number }[], fileName: string): void {
-    const header = ['Producto', 'Cantidad'];
-    const data = inventoryData.map(item => [item.productName, item.quantity]);
+  exportToExcel(inventoryData: { productName: string; quantity: number }[], fileName: string): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const header = ['Producto', 'Cantidad'];
+      const data = inventoryData.map((item) => [item.productName, item.quantity]);
 
-    const content = [header, ...data];
+      const content = [header, ...data];
 
-    const blob = new Blob([this.arrayToCSV(content)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${fileName}.xlsx`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const blob = new Blob([this.arrayToCSV(content)], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${fileName}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      resolve(blob);
+    });
   }
 
   private arrayToCSV(data: any[][]): string {
-    return data.map(row => row.join(',')).join('\n');
+    return data.map((row) => row.join(',')).join('\n');
   }
 }
