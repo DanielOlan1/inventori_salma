@@ -154,10 +154,13 @@ agregarProducto() {
 
 
   exportDataToExcel() {
-    // Aquí debes proporcionar los datos que deseas exportar
     const dataToExport = this.inventoryData;
 
-    // Llama al servicio para exportar a Excel
-    this.excelService.exportToExcel(dataToExport, 'Inventary_salma', '1');
+    // Pregunta al usuario si desea descargar el archivo
+    const confirmDownload = confirm('¿Deseas descargar el archivo Excel?');
+    
+    if (confirmDownload) {
+      this.excelService.downloadExcel(dataToExport, 'nombre-del-archivo', 'nombre-de-la-hoja');
+    }
   }
 }
