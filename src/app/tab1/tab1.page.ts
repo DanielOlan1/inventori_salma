@@ -126,6 +126,7 @@ agregarProducto() {
     const confirmDelete = await this.alertController.create({
       header: 'Eliminar Producto',
       message: '¿Seguro que deseas eliminar este producto?',
+      mode: 'ios',
       buttons: [
         'Cancelar',
         {
@@ -152,15 +153,51 @@ agregarProducto() {
     }
   }
 
+  downloadLink: string | null = null; 
+  async downloadAndShowLink(dataToExport: any[], fileName: string, sheetName: string) {
+    // Descarga el archivo Excel y obtén el Blob del servicio
+    const blob = this.excelService.downloadExcel(dataToExport, fileName, sheetName);
 
-  exportDataToExcel() {
-    const dataToExport = this.inventoryData;
+    // Crea una URL para el Blob
+    const url = URL.createObjectURL(blob);
 
-    // Pregunta al usuario si desea descargar el archivo
-    const confirmDownload = confirm('¿Deseas descargar el archivo Excel?');
-    
-    if (confirmDownload) {
-      this.excelService.downloadExcel(dataToExport, 'nombre-del-archivo', 'nombre-de-la-hoja');
+    // Muestra el enlace en la interfaz de usuario
+    this.downloadLink = url;
+  }
+  
+
+  async confirmarDescarga() {
+    const confirmAlert = await this.alertController.create({
+      header: 'Confirmar Descarga',
+      message: '¿Deseas descargar el archivo?',
+      mode: 'ios',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+        },
+        {
+          text: 'Descargar',
+          handler: () => {
+            this.descargarArchivo();
+          },
+        },
+      ],
+    });
+
+    await confirmAlert.present();
+  }
+
+  async descargarArchivo() {
+    if (this.downloadLink) {
+      const link = document.createElement('a');
+      link.href = this.downloadLink;
+      link.download = 'nombre-del-archivo.xlsx';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   }
 }
+

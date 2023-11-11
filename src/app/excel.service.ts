@@ -6,20 +6,15 @@ import * as XLSX from 'xlsx';
   providedIn: 'root',
 })
 export class ExcelService {
-  constructor() {}
-  downloadExcel(data: any[], fileName: string, sheetName: string): void {
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
-    const workbook: XLSX.WorkBook = { Sheets: { [sheetName]: worksheet }, SheetNames: [sheetName] };
+  downloadExcel(data: any[], fileName: string, sheetName: string): Blob {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(data);
 
-    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
-    const downloadLink = document.createElement('a');
-    downloadLink.href = window.URL.createObjectURL(dataBlob);
-    downloadLink.download = `${fileName}.xlsx`;
+    // Genera un Blob desde el libro
+    const blob = XLSX.write(wb, { bookType: 'xlsx', type: 'blob' as 'string' });
 
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    return blob;
   }
 }
